@@ -1,5 +1,7 @@
 package com.fly.guess
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,7 +11,7 @@ import kotlinx.android.synthetic.main.activity_material.*
 import kotlinx.android.synthetic.main.content_material.*
 
 class MaterialActivity : AppCompatActivity() {
-    private val secretNumber = SecretNumber()
+    val secretNumber = SecretNumber()
     val TAG = MaterialActivity::class.java.simpleName
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +33,13 @@ class MaterialActivity : AppCompatActivity() {
                 .setNeutralButton(getString(R.string.cancel), null)
                 .show()
         }
+
+        val count = getSharedPreferences("guess", Context.MODE_PRIVATE)
+            .getString("rec_count", null)
+        val name = getSharedPreferences("guess", Context.MODE_PRIVATE)
+            .getString("rec_name", null)
+        Log.d(TAG, "data: $count / $name")
+
     }
 
     fun check(view : View) {
@@ -47,7 +56,13 @@ class MaterialActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.message))
             .setMessage(message)
-            .setPositiveButton(getString(R.string.ok), null)
+            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+                if (result == 0) {
+                    val intent = Intent(this, RecordActivity::class.java)
+                    intent.putExtra("counter", numCount)
+                    startActivity(intent)
+                }
+            }
             .show()
         count.text = numCount
     }
